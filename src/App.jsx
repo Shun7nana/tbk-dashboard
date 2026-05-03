@@ -1,148 +1,113 @@
 import { useEffect, useState } from "react";
+import { db } from "./firebase";
+import {
+  doc,
+  setDoc,
+  onSnapshot,
+  collection,
+  addDoc,
+  query,
+  orderBy
+} from "firebase/firestore";
 
-const ROOMS = [
-  "多目的室",
-  "会議室2",
-  "会議室3",
-  "NCUホール",
-  "部室",
-];
-
-const PASSWORD = "0331";
+const rooms = ["多目的室", "会議室2", "会議室3", "NCUホール", "部室"];
 
 export default function App() {
-  const [roomStatus, setRoomStatus] = useState({});
-  const [keyStatus, setKeyStatus] = useState(false);
+  const [roomStates, setRoomStates] = useState({});
+  const [keyState, setKeyState] = useState(false);
   const [logs, setLogs] = useState([]);
 
+  // リアルタイム取得（部屋）
   useEffect(() => {
-    const savedRooms = localStorage.getItem("room-status");
-    const savedKey = localStorage.getItem("key-status");
-    const savedLogs = localStorage.getItem("logs");
-
-    if (savedRooms) {
-      setRoomStatus(JSON.parse(savedRooms));
-    } else {
-      const init = {};
-      ROOMS.forEach((r) => (init[r] = false));
-      setRoomStatus(init);
-    }
-
-    if (savedKey) setKeyStatus(JSON.parse(savedKey));
-    if (savedLogs) setLogs(JSON.parse(savedLogs));
+    const unsubscribers = rooms.map((room) =>
+      onSnapshot(doc(db, "rooms", room), (snap) => {
+        setRoomStates((prev) => ({
+          ...prev,
+          [room]: snap.data()?.active || false
+        }));
+      })
+    );
+    return () => unsubscribers.forEach((u) => u());
   }, []);
 
+  // 鍵
   useEffect(() => {
-    localStorage.setItem("room-status", JSON.stringify(roomStatus));
-  }, [roomStatus]);
-
-  useEffect(() => {
-    localStorage.setItem("key-status", JSON.stringify(keyStatus));
-  }, [keyStatus]);
-
-  useEffect(() => {
-    localStorage.setItem("logs", JSON.stringify(logs));
-  }, [logs]);
-
-  const addLog = (text) => {
-    const time = new Date().toLocaleString();
-
-    setLogs((prev) => {
-      const newLogs = [{ text, time }, ...prev];
-      return newLogs.slice(0, 100);
+    return onSnapshot(doc(db, "key", "status"), (snap) => {
+      setKeyState(snap.data()?.borrowed || false);
     });
-  };
+  }, []);
 
-  const toggleRoom = (room) => {
-    const name = prompt("名前を入力してください");
-    if (!name) return;
+  // ログ
+  useEffect(() => {
+    const q = query(collection(db, "logs"), orderBy("time", "desc"));
+    return onSnapshot(q, (snap) => {
+      setLogs(snap.docs.map((doc) => doc.data()));
+    });
+  }, []);
 
-    const pass = prompt("パスワードを入力してください");
-    if (pass !== PASSWORD) {
+  const handleChange = async (type, target) => {
+    const name = prompt("名前を入力");
+    const pass = prompt("パスワードを入力");
+
+    if (pass !== "0331") {
       alert("パスワードが違います");
       return;
     }
 
-    setRoomStatus((prev) => {
-      const next = !prev[room];
-      addLog(
-        `${name}が${room}を${next ? "活動中" : "活動なし"}に変更しました`
-      );
-      return { ...prev, [room]: next };
-    });
-  };
+    if (type === "room") {
+      const newState = !roomStates[target];
+      await setDoc(doc(db, "rooms", target), { active: newState });
 
-  const toggleKey = () => {
-    const name = prompt("名前を入力してください");
-    if (!name) return;
-
-    const pass = prompt("パスワードを入力してください");
-    if (pass !== PASSWORD) {
-      alert("パスワードが違います");
-      return;
+      await addDoc(collection(db, "logs"), {
+        text: `${name}が${target}を${newState ? "活動中" : "活動なし"}に変更`,
+        time: new Date()
+      });
     }
 
-    setKeyStatus((prev) => {
-      const next = !prev;
-      addLog(`${name}が鍵を${next ? "借りました" : "返却しました"}`);
-      return next;
-    });
+    if (type === "key") {
+      const newState = !keyState;
+      await setDoc(doc(db, "key", "status"), { borrowed: newState });
+
+      await addDoc(collection(db, "logs"), {
+        text: `${name}が鍵を${newState ? "借りました" : "返却しました"}`,
+        time: new Date()
+      });
+    }
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "sans-serif" }}>
-      {/* LEFT */}
-      <div style={{ flex: 1, padding: 20, borderRight: "1px solid #ddd" }}>
+    <div style={{ display: "flex", padding: 20 }}>
+      {/* 左 */}
+      <div style={{ width: "40%" }}>
         <h2>活動状況</h2>
+        {rooms.map((room) => (
+          <div key={room}>
+            <b>{room}</b>：
+            <span style={{ color: roomStates[room] ? "green" : "gray" }}>
+              {roomStates[room] ? " 活動中" : " 活動なし"}
+            </span>
+            <button onClick={() => handleChange("room", room)}>
+              切替
+            </button>
+          </div>
+        ))}
 
-        {ROOMS.map((room) => {
-          const active = roomStatus[room];
-          return (
-            <div
-              key={room}
-              onClick={() => toggleRoom(room)}
-              style={{
-                padding: 12,
-                marginBottom: 10,
-                borderRadius: 8,
-                cursor: "pointer",
-                background: active ? "#22c55e" : "#ef4444",
-                color: "white",
-                display: "flex",
-                justifyContent: "space-between",
-                fontWeight: "bold",
-              }}
-            >
-              <span>{room}</span>
-              <span>{active ? "活動中" : "活動なし"}</span>
-            </div>
-          );
-        })}
-
-        <h2 style={{ marginTop: 30 }}>鍵管理</h2>
-        <div
-          onClick={toggleKey}
-          style={{
-            padding: 12,
-            borderRadius: 8,
-            cursor: "pointer",
-            background: keyStatus ? "#3b82f6" : "#9ca3af",
-            color: "white",
-            fontWeight: "bold",
-          }}
-        >
-          {keyStatus ? "鍵：借りている" : "鍵：借りていない"}
+        <h2>鍵</h2>
+        <div>
+          状態：
+          <span style={{ color: keyState ? "red" : "blue" }}>
+            {keyState ? " 借りている" : " 借りていない"}
+          </span>
+          <button onClick={() => handleChange("key")}>切替</button>
         </div>
       </div>
 
-      {/* RIGHT */}
-      <div style={{ width: 420, padding: 20, overflowY: "auto" }}>
+      {/* 右 */}
+      <div style={{ width: "60%" }}>
         <h2>ログ</h2>
-
         {logs.map((log, i) => (
-          <div key={i} style={{ marginBottom: 10, fontSize: 14 }}>
-            <div>{log.text}</div>
-            <div style={{ fontSize: 12, color: "gray" }}>{log.time}</div>
+          <div key={i}>
+            {log.text}（{log.time?.toDate?.().toLocaleString()}）
           </div>
         ))}
       </div>
