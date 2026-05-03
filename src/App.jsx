@@ -12,6 +12,15 @@ import {
 
 const rooms = ["多目的室", "会議室2", "会議室3", "NCUホール", "部室"];
 
+const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+const theme = {
+  bg: isDark ? "#121212" : "#f5f5f5",
+  card: isDark ? "#1e1e1e" : "white",
+  text: isDark ? "#ffffff" : "#000000",
+  subText: isDark ? "#aaaaaa" : "#666666",
+};
+
 export default function App() {
   const [roomStates, setRoomStates] = useState({});
   const [keyState, setKeyState] = useState(false);
@@ -147,33 +156,36 @@ const styles = {
     display: "flex",
     height: "100vh",
     fontFamily: "sans-serif",
-    flexDirection: "row",
+    background: theme.bg,
+    color: theme.text,
   },
 
   left: {
     width: "40%",
     padding: 15,
-    background: "#f5f5f5",
+    background: theme.bg,
     overflowY: "auto",
   },
 
   right: {
     width: "60%",
     padding: 15,
+    background: theme.bg,
     overflowY: "auto",
   },
 
   card: {
-    background: "white",
+    background: theme.card,
     padding: 15,
     marginBottom: 10,
     borderRadius: 10,
-    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
   },
 
   title: {
     fontWeight: "bold",
     fontSize: 16,
+    color: theme.text,
   },
 
   status: {
@@ -188,17 +200,16 @@ const styles = {
     background: "#007bff",
     color: "white",
     cursor: "pointer",
-    fontSize: 14,
   },
 
   log: {
-    borderBottom: "1px solid #ddd",
+    borderBottom: `1px solid ${theme.subText}`,
     padding: "10px 0",
   },
 
   time: {
     fontSize: 12,
-    color: "gray",
+    color: theme.subText,
   },
 };
 
