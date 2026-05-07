@@ -99,7 +99,7 @@ export default function App() {
         time: new Date(),
       });
 
-      await fetch(""https://discordapp.com/api/webhooks/1501764757923954731/LfAp28fS8c7vwEVh8gx16OaiPq4yq-haLcJXv9L7sSeaY1QOYd6m2TDt3b_ppVCpyJ6R", {
+      await fetch("https://discordapp.com/api/webhooks/1501764757923954731/LfAp28fS8c7vwEVh8gx16OaiPq4yq-haLcJXv9L7sSeaY1QOYd6m2TDt3b_ppVCpyJ6R", {
       method: "POST",
         headers: {
           "Content-Type": "application/json",
