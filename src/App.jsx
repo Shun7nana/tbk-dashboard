@@ -73,6 +73,18 @@ export default function App() {
         }に変更しました`,
         time: new Date(),
       });
+
+      await fetch("https://discordapp.com/api/webhooks/1501764757923954731/LfAp28fS8c7vwEVh8gx16OaiPq4yq-haLcJXv9L7sSeaY1QOYd6m2TDt3b_ppVCpyJ6R", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: `📢 ${name}が${target}を${
+          newState ? "活動中" : "活動なし"
+          }に変更しました`,
+        }),
+      });
     }
 
     if (type === "key") {
@@ -85,6 +97,18 @@ export default function App() {
       await addDoc(collection(db, "logs"), {
         text: `${name}が鍵を${newState ? "借りました" : "返却しました"}`,
         time: new Date(),
+      });
+
+      await fetch(""https://discordapp.com/api/webhooks/1501764757923954731/LfAp28fS8c7vwEVh8gx16OaiPq4yq-haLcJXv9L7sSeaY1QOYd6m2TDt3b_ppVCpyJ6R", {
+      method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: `🔑 ${name}が鍵を${
+            newState ? "借りました" : "返却しました"
+          }`,
+        }),
       });
     }
   };
