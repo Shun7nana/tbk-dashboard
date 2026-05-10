@@ -54,6 +54,56 @@ export default function App() {
     });
   }, []);
 
+  useEffect(() => {
+  const resetAtNight = async () => {
+    const now = new Date();
+
+    // 今日の日付
+    const today =
+      now.getFullYear() +
+      "-" +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(now.getDate()).padStart(2, "0");
+
+    // 21時以降だけ
+    if (now.getHours() < 21) return;
+
+    const resetRef = doc(db, "system", "reset");
+    const resetSnap = await getDoc(resetRef);
+
+    const lastReset = resetSnap.data()?.lastReset;
+
+    // 今日すでにリセット済みなら終了
+    if (lastReset === today) return;
+
+    // 全部屋OFF
+    for (const room of rooms) {
+      await setDoc(doc(db, "rooms", room), {
+        active: false,
+      });
+    }
+
+    // 鍵返却
+    await setDoc(doc(db, "key", "status"), {
+      borrowed: false,
+    });
+
+    // ログ追加
+    await addDoc(collection(db, "logs"), {
+      text: "活動状況がリセットされました",
+      time: new Date(),
+    });
+
+    // 今日リセットした記録
+    await setDoc(resetRef, {
+      lastReset: today,
+    });
+  };
+
+  resetAtNight();
+}, []);
+
   const handleChange = async (type, target) => {
     const name = prompt("名前を入力してください");
     const pass = prompt("パスワードを入力してください");
