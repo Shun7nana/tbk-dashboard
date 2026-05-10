@@ -8,6 +8,7 @@ import {
   addDoc,
   query,
   orderBy,
+  getDoc,
 } from "firebase/firestore";
 
 const rooms = ["多目的室", "会議室2", "会議室3", "NCUホール", "部室"];
