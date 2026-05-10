@@ -77,6 +77,26 @@ export default function App() {
     // 今日すでにリセット済みなら終了
     if (lastReset === today) return;
 
+    let hasActiveRoom = false;
+
+    for (const room of rooms) {
+      const roomSnap = await getDoc(doc(db, "rooms", room));
+
+      if (roomSnap.data()?.active) {
+        hasActiveRoom = true;
+        break;
+      }
+    }
+
+     // 鍵確認
+     const keySnap = await getDoc(doc(db, "key", "status"));
+     const keyBorrowed = keySnap.data()?.borrowed;
+
+     // 全部OFFかつ鍵も借りてないなら終了
+    if (!hasActiveRoom && !keyBorrowed) {
+      return;
+    }
+
     // 全部屋OFF
     for (const room of rooms) {
       await setDoc(doc(db, "rooms", room), {
