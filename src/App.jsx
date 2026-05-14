@@ -351,23 +351,23 @@ const styles = {
   },
 
   tabs: {
-  display: "flex",
-  flexDirection: "row",
-  width: "100%",
-  padding: 10,
-  boxSizing: "border-box",
-  gap: 0,
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    padding: 10,
+    boxSizing: "border-box",
+    gap: 0,
   },
 
   tabButton: {
-  flex: 1,
-  padding: 14,
-  border: "none",
-  background: "transparent",
-  color: theme.text,
-  fontSize: 16,
-  fontWeight: "bold",
-  cursor: "pointer",
+    flex: 1,
+    padding: 14,
+    border: "none",
+    background: "transparent",
+    color: theme.text,
+    fontSize: 16,
+    fontWeight: "bold",
+    cursor: "pointer",
   },
 };
 
