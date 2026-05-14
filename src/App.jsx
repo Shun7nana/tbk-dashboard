@@ -193,8 +193,10 @@ export default function App() {
           <button
             style={{
               ...styles.tabButton,
-              background:
-                mobileTab === "status" ? "#007bff" : "#999",
+              borderBottom:
+                mobileTab === "status"
+                ? "3px solid #007bff"
+                : "3px solid transparent",
             }}
             onClick={() => setMobileTab("status")}
           >
@@ -204,8 +206,10 @@ export default function App() {
           <button
             style={{
               ...styles.tabButton,
-              background:
-                mobileTab === "logs" ? "#007bff" : "#999",
+              borderBottom:
+                mobileTab === "status"
+                ? "3px solid #007bff"
+                : "3px solid transparent",
             }}
             onClick={() => setMobileTab("logs")}
           >
@@ -345,19 +349,24 @@ const styles = {
     fontSize: 12,
     color: theme.subText,
   },
+
   tabs: {
   display: "flex",
-  gap: 10,
   padding: 10,
+  background: theme.card,
+  borderBottom: `1px solid ${theme.subText}`,
   },
 
   tabButton: {
-    flex: 1,
-    padding: 10,
-    border: "none",
-    borderRadius: 8,
-    color: "white",
-    fontSize: 16,
+  flex: 1,
+  padding: 14,
+  border: "none",
+  borderBottom: "3px solid transparent",
+  background: "transparent",
+  color: theme.text,
+  fontSize: 16,
+  fontWeight: "bold",
+  cursor: "pointer",
   },
 };
 
