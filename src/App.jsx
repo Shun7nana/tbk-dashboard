@@ -352,16 +352,17 @@ const styles = {
 
   tabs: {
   display: "flex",
+  flexDirection: "row",
+  width: "100%",
   padding: 10,
-  background: theme.card,
-  borderBottom: `1px solid ${theme.subText}`,
+  boxSizing: "border-box",
+  gap: 0,
   },
 
   tabButton: {
   flex: 1,
   padding: 14,
   border: "none",
-  borderBottom: "3px solid transparent",
   background: "transparent",
   color: theme.text,
   fontSize: 16,
