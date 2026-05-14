@@ -205,9 +205,9 @@ export default function App() {
 
           <button
             style={{
-              ...styles.tabButton,
+              ...styles.tabButton,npm
               borderBottom:
-                mobileTab === "status"
+                mobileTab === "logs"
                 ? "3px solid #007bff"
                 : "3px solid transparent",
             }}
