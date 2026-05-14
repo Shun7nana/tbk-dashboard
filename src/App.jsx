@@ -195,8 +195,8 @@ export default function App() {
               ...styles.tabButton,
               borderBottom:
                 mobileTab === "status"
-                ? "3px solid #007bff"
-                : "3px solid transparent",
+                  ? "3px solid #007bff"
+                  : "3px solid transparent",
             }}
             onClick={() => setMobileTab("status")}
           >
@@ -205,11 +205,11 @@ export default function App() {
 
           <button
             style={{
-              ...styles.tabButton,npm
+              ...styles.tabButton,
               borderBottom:
                 mobileTab === "logs"
-                ? "3px solid #007bff"
-                : "3px solid transparent",
+                  ? "3px solid #007bff"
+                  : "3px solid transparent",
             }}
             onClick={() => setMobileTab("logs")}
           >
