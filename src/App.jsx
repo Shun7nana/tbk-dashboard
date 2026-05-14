@@ -26,6 +26,8 @@ export default function App() {
   const [roomStates, setRoomStates] = useState({});
   const [keyState, setKeyState] = useState(false);
   const [logs, setLogs] = useState([]);
+  const [mobileTab, setMobileTab] = useState("status");
+  const isMobile = window.innerWidth <= 768;
 
   // 部屋
   useEffect(() => {
@@ -185,64 +187,101 @@ export default function App() {
   };
 
   return (
-    <div style={styles.container}>
-      {/* 左 */}
-      <div style={styles.left}>
-        <h2>活動状況</h2>
-
-        {rooms.map((room) => (
-          <div key={room} style={styles.card}>
-            <div style={styles.title}>{room}</div>
-
-            <div
-              style={{
-                ...styles.status,
-                color: roomStates[room] ? "green" : "gray",
-              }}
-            >
-              ● {roomStates[room] ? "活動中" : "活動なし"}
-            </div>
-
-            <button
-              style={styles.button}
-              onClick={() => handleChange("room", room)}
-            >
-              切替
-            </button>
-          </div>
-        ))}
-
-        <h2>鍵</h2>
-        <div style={styles.card}>
-          <div
+    <>
+      {isMobile && (
+        <div style={styles.tabs}>
+          <button
             style={{
-              ...styles.status,
-              color: keyState ? "red" : "blue",
+              ...styles.tabButton,
+              background:
+                mobileTab === "status" ? "#007bff" : "#999",
             }}
+            onClick={() => setMobileTab("status")}
           >
-            ● {keyState ? "借りている" : "借りていない"}
-          </div>
+            活動状況
+          </button>
 
-          <button style={styles.button} onClick={() => handleChange("key")}>
-            切替
+          <button
+            style={{
+              ...styles.tabButton,
+              background:
+                mobileTab === "logs" ? "#007bff" : "#999",
+            }}
+            onClick={() => setMobileTab("logs")}
+          >
+            ログ
           </button>
         </div>
-      </div>
+      )}
+      
+      <div style={styles.container}>
+        {/* 左 */}
+        {(!isMobile || mobileTab === "status") && (
+          <div style={styles.left}>
+            <h2>活動状況</h2>
 
-      {/* 右 */}
-      <div style={styles.right}>
-        <h2>ログ</h2>
+            {rooms.map((room) => (
+              <div key={room} style={styles.card}>
+                <div style={styles.title}>{room}</div>
+                
+                <div
+                  style={{
+                    ...styles.status,
+                    color: roomStates[room] ? "green" : "gray",
+                  }}
+                >
+                  ● {roomStates[room] ? "活動中" : "活動なし"}
+                </div>
+  
+                <button
+                  style={styles.button}
+                  onClick={() => handleChange("room", room)}
+                >
+                  切替
+                </button>
+              </div>
+            ))}
+            
+            <h2>鍵</h2>
+  
+            <div style={styles.card}>
+              <div
+                style={{
+                  ...styles.status,
+                  color: keyState ? "red" : "blue",
+                }}
+              >
+                ● {keyState ? "借りている" : "借りていない"}
+              </div>
 
-        {logs.map((log, i) => (
-          <div key={i} style={styles.log}>
-            <div>{log.text}</div>
-            <div style={styles.time}>
-              {log.time?.toDate?.().toLocaleString()}
+              <button
+                style={styles.button}
+                onClick={() => handleChange("key")}
+              >
+                切替
+              </button>
             </div>
           </div>
-        ))}
+        )}
+
+        {/* 右 */}
+        {(!isMobile || mobileTab === "logs") && (
+          <div style={styles.right}>
+            <h2>ログ</h2>
+            
+            {logs.map((log, i) => (
+              <div key={i} style={styles.log}>
+                <div>{log.text}</div>
+  
+                <div style={styles.time}>
+                  {log.time?.toDate?.().toLocaleString()}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -305,6 +344,20 @@ const styles = {
   time: {
     fontSize: 12,
     color: theme.subText,
+  },
+  tabs: {
+  display: "flex",
+  gap: 10,
+  padding: 10,
+  },
+
+  tabButton: {
+    flex: 1,
+    padding: 10,
+    border: "none",
+    borderRadius: 8,
+    color: "white",
+    fontSize: 16,
   },
 };
 
